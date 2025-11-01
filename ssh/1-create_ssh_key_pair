@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Generate an RSA key pair with a passphrase
+# Create an SSH key pair with a passphrase
+# Requirements: name of the created private key must be school
+#               passphrase must be betty
+#               key size must be 4096 bits
 
 PRIVATE_KEY="school"
 PASSPHRASE="betty"
