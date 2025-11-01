@@ -1,0 +1,10 @@
+# Apply these setting for yout specific server
+
+Host my-server
+	HostName 98.94.46.177
+	User ubuntu
+	IdentityFile ~/.ssh/school
+	IdentitiesOnly yes
+	PasswordAuthentication no
+	PubkeyAuthentication yes
+	PreferredAuthentication publickey
