@@ -5,24 +5,26 @@ set -e
 sudo apt-get -y update
 sudo apt-get install -y nginx
 
+sudo mkdir -p /var/www/html
+
 sudo tee /etc/nginx/sites-available/default > /dev/null << 'EOF'
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+	listen 80 default_server;
+	listen [::]:80 default_server;
 
-    root /var/www/html;
-    index index.html index.htm;
+	root /var/www/html;
+	index index.html index.htm;
 
-    server_name _;
+	server_name _;
+	
+	location /redirect_me {
+		return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+	}
 
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    location /redirect_me {
-        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
-    }
+	location / {
+        	try_files $uri $uri/ =404;
+	}
 }
 EOF
 
-sudo systemctl restart nginx
+sudo service nginx restart
