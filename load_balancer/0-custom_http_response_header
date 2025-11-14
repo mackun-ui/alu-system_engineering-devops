@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# configure nginx to add a cutom HTTP response header
+# shellcheck disable=SC2154
+
+set -e
+
+sudo apt-get update -y
+sudo apt-get install -y nginx
+
+sudo mkdir -p /var/www/html
+
+HOSTNAME=$(hostname)
+
+sudo tee /etc/nginx/sites-available/default > /dev/null << EOF
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        root /var/www/html;
+        index index.html index.htm;
+
+        server_name _;
+
+        add_header X-Served-By $HOSTNAME always;
+
+        location / {
+                try_files \$uri \$uri/ =404;
+        }
+}
+EOF
+
+sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+sudo nginx -t
+
+sudo pkill nginx || true
+
+sudo nginx
