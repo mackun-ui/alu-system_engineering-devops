@@ -2,7 +2,7 @@
 # this script redirects 
 set -e
 
-sudo apt-get -y update
+sudo apt-get update -y 
 sudo apt-get install -y nginx
 
 sudo mkdir -p /var/www/html
@@ -13,15 +13,22 @@ server {
 	listen [::]:80 default_server;
 
 	root /var/www/html;
-	index index.html index.htm index.nginx-debian.html;
+	index index.html index.htm;
 
 	server_name _;
 	
-	location /redirect_me {
+	location = /redirect_me {
 		return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+	}
+
+	location / {
+		try_files $uri $uri/ =404;
 	}
 }
 EOF
 
+sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+sudo nginx -t
+
 sudo service nginx restart
-sudo service nginx reload
