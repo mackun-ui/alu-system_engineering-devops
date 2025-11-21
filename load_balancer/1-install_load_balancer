@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# install & configure HAproxy to load balance web-01 and web-02
+
+set -e
+
+web01_IP="98.94.46.177"
+web02_IP="3.87.243.253"
+
+sudo apt-get update -y
+sudo apt-get install -y haproxy
+
+sudo sed -i 's/ENABLED=0/ENABLED=1/' /etc/default/haproxy
+
+sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOF
+global
+	log /dev/log    local0
+	log /dev/log    local1 notice
+	daemon
+	maxconn 4096
+
+defaults
+	log     global
+	mode    http
+	option  httplog
+	option  dontlognull
+	retries 3
+	timeout connect 5000ms
+	timeout client  50000ms
+	timeout server  50000ms
+
+# Frontend listening on port 80
+frontend http_front
+	bind *:80
+	default_backend http_back
+
+# Backend with roundrobin balancing
+backend http_back
+	balance roundrobin
+	server web01 $WEB01_IP:80 check
+	server web02 $WEB02_IP:80 check
+
+EOF
+
+sudo service haproxy restart
+echo "HAProxy successfully configured."
